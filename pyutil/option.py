@@ -113,6 +113,9 @@ class Just(Option):
     @property
     def value(self):
         return self.__value
+    
+    def __repr__(self, *args, **kwargs):
+        return "Just(%s)" % self.__value
 
 
 class Nothing(Option):
@@ -127,3 +130,6 @@ class Nothing(Option):
     @property
     def value(self):
         raise ValueError('Cannot get value from Nothing')
+    
+    def __repr__(self, *args, **kwargs):
+        return "Nothing"

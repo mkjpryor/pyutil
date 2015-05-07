@@ -139,9 +139,12 @@ class Success(Result):
     @property
     def result(self):
         return self.__result
+    
+    def __repr__(self, *args, **kwargs):
+        return "Success(%s)" % self.__result
 
 
-def Failure(Result):
+class Failure(Result):
     """
     Represents the result of a failed computation
     """
@@ -162,3 +165,6 @@ def Failure(Result):
     @property
     def result(self):
         raise self.__error
+    
+    def __repr__(self, *args, **kwargs):
+        return "Failed(%s)" % self.__error
