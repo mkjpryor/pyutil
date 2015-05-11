@@ -16,21 +16,21 @@ import abc
 from pyutil import option
 
 
-class Result(object):
+class Result(metaclass = abc.ABCMeta):
     """
     A result represents the result of a (potentially failed) computation
     """
     
-    __metaclass__ = abc.ABCMeta
-    
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def failed(self):
         """
         True if this result is a failure, False otherwise
         """
         pass
     
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def error(self):
         """
         If this result is a failure, this is the exception that caused it
@@ -38,7 +38,8 @@ class Result(object):
         """
         pass
     
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def result(self):
         """
         If this result is a success, this is the result
@@ -118,6 +119,35 @@ class Result(object):
         """
         if self.success:
             yield self.result
+            
+    def __eq__(self, other):
+        """
+        Returns true if this result is equal to another, false otherwise
+        """
+        # Two results are considered equal if they contain either the same
+        # value (if both successes) or the same error (if both failures)
+        if not isinstance(other, Result):
+            return False
+        
+        if self.failed != other.failed:
+            return False
+        
+        return self.result == other.result if self.success else self.error == other.error
+    
+    def __ne__(self, other):
+        """
+        Returns true if this result is not equal to another, false otherwise
+        """
+        return not self.__eq__(other)
+    
+    def __hash__(self):
+        """
+        Returns the hash of this result
+        """
+        # For Success, use the hash of the underlying result
+        # For Failure, use the hash of the error
+        # This means Results are only hashable if their contents are hashable
+        return hash(self.result) if self.success else hash(self.error)
 
 
 class Success(Result):

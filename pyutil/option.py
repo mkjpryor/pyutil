@@ -13,21 +13,21 @@ in a safe (i.e. non-throwing) or unsafe (i.e. might throw) way
 import abc
 
 
-class Option(object):
+class Option(metaclass = abc.ABCMeta):
     """
     Represents an optional value
     """
     
-    __metaclass__ = abc.ABCMeta
-    
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def empty(self):
         """
         True if this option is empty, false otherwise
         """
         pass
     
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def value(self):
         """
         Returns the option's value
@@ -96,7 +96,36 @@ class Option(object):
         """
         if self.defined:
             yield self.value
-
+            
+    def __eq__(self, other):
+        """
+        Returns true if this option is equal to another, false otherwise
+        """
+        # Two options are considered equal if they are both empty or if they
+        # contain values that are considered equal
+        if not isinstance(other, Option):
+            return False
+        
+        if self.empty != other.empty:
+            return False
+        
+        return self.value == other.value if self.defined else True
+    
+    def __ne__(self, other):
+        """
+        Returns true if this option is not equal to another, false otherwise
+        """
+        return not self.__eq__(other)
+    
+    def __hash__(self):
+        """
+        Returns the hash of this object
+        """
+        # For Nothing, always use the same hash
+        # For Just, use the hash of the underlying object
+        # This means Options are only hashable if their contents are hashable
+        return hash(self.value) if self.defined else 0
+        
 
 class Just(Option):
     """
